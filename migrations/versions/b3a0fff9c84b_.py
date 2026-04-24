@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: 7ec2ff6bd401
+Revision ID: b3a0fff9c84b
 Revises: 
-Create Date: 2026-04-20 10:04:56.726531
+Create Date: 2026-04-24 10:14:16.317194
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '7ec2ff6bd401'
+revision = 'b3a0fff9c84b'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -24,7 +24,6 @@ def upgrade():
     sa.Column('edad', sa.Integer(), nullable=False),
     sa.Column('genero', sa.String(length=120), nullable=False),
     sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('genero'),
     sa.UniqueConstraint('nombre_personaje')
     )
     op.create_table('planetas',
@@ -33,8 +32,7 @@ def upgrade():
     sa.Column('habitantes', sa.Integer(), nullable=False),
     sa.Column('ubicacion', sa.String(length=120), nullable=False),
     sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('nombre_planetas'),
-    sa.UniqueConstraint('ubicacion')
+    sa.UniqueConstraint('nombre_planetas')
     )
     op.create_table('user',
     sa.Column('id', sa.Integer(), nullable=False),
@@ -42,26 +40,22 @@ def upgrade():
     sa.Column('apellido', sa.String(length=120), nullable=False),
     sa.Column('email', sa.String(length=120), nullable=False),
     sa.Column('password', sa.String(), nullable=False),
-    sa.Column('is_active', sa.Boolean(), nullable=False),
     sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('apellido'),
-    sa.UniqueConstraint('email'),
-    sa.UniqueConstraint('nombre')
+    sa.UniqueConstraint('email')
     )
     op.create_table('vehiculos',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('nombre_vehiculos', sa.String(length=120), nullable=False),
-    sa.Column('modelo', sa.Integer(), nullable=False),
+    sa.Column('modelo', sa.String(length=120), nullable=False),
     sa.Column('pasajeros', sa.Integer(), nullable=False),
     sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('nombre_vehiculos'),
-    sa.UniqueConstraint('pasajeros')
+    sa.UniqueConstraint('nombre_vehiculos')
     )
     op.create_table('favoritos',
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('id_personajes', sa.Integer(), nullable=False),
-    sa.Column('id_vehiculos', sa.Integer(), nullable=False),
-    sa.Column('id_planetas', sa.Integer(), nullable=False),
+    sa.Column('id_personajes', sa.Integer(), nullable=True),
+    sa.Column('id_vehiculos', sa.Integer(), nullable=True),
+    sa.Column('id_planetas', sa.Integer(), nullable=True),
     sa.Column('user_id', sa.Integer(), nullable=False),
     sa.ForeignKeyConstraint(['id_personajes'], ['personaje.id'], ),
     sa.ForeignKeyConstraint(['id_planetas'], ['planetas.id'], ),

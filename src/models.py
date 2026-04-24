@@ -7,11 +7,11 @@ db = SQLAlchemy()
 
 class User(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
-    nombre: Mapped[str] = mapped_column(String(120), unique=True, nullable=False)
+    nombre: Mapped[str] = mapped_column(String(120), nullable=False)
     apellido: Mapped[str] = mapped_column(String(120), nullable=False)
     email: Mapped[str] = mapped_column(String(120), unique=True, nullable=False)
     password: Mapped[str] = mapped_column(nullable=False)
-    is_active: Mapped[bool] = mapped_column(Boolean(), unique=True, nullable=False)
+   
 
     favoritos: Mapped[List["Favoritos"]] = relationship("Favoritos", back_populates="user")
 

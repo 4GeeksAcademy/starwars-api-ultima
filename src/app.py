@@ -2,7 +2,7 @@
 This module takes care of starting the API Server, Loading the DB and Adding the endpoints
 """
 import os
-from flask import Flask, request, jsonify, url_for
+from flask import Flask, request, jsonify
 from flask_migrate import Migrate
 from flask_swagger import swagger
 from flask_cors import CORS
@@ -169,7 +169,86 @@ def handle_user_favorites():
        "msg": "ok",
        "result": user.serialize()
        }
+    return jsonify(response_body), 200
 
+#METODOS PARA CREAR USUARIOS, PERSONAJES, PLANETAS Y VEHICULOS
+@app.route('/user', methods=['POST'])
+def user_post():
+    body = request.json
+    #busqueda del email del usuario en la base de datos para evitar duplicados
+    email=db.session.execute(select(User).where(User.email == body["email"])).scalar_one_or_none()
+    if  email  is None:
+# si el email no existe, se crea un nuevo objeto User con los datos proporcionados en el cuerpo de la solicitud y se guarda en la base de datos
+        usuario_nuevo = User(nombre=body["nombre"], apellido=body["apellido"], email=body["email"], password=body["password"])
+        db.session.add(usuario_nuevo)
+        db.session.commit()
+
+        response_body = {       
+            "msg": "usuario creado",
+                                         
+            }
+        return jsonify(response_body), 201
+    
+    return jsonify({"msg": "User already exists"}), 400
+
+
+
+@app.route('/personaje', methods=['POST'])
+def personaje_post():
+    body = request.json
+#busqueda del nombre del personaje en la base de datos para evitar duplicados
+    nombre_personaje=db.session.execute(select(Personaje).where(Personaje.nombre_personaje == body["nombre_personaje"])).scalar_one_or_none()
+    if  nombre_personaje  is None:
+# si el personaje no existe, se crea un nuevo objeto Personaje con los datos proporcionados en el cuerpo de la solicitud y se guarda en la base de datos
+        personaje_nuevo = Personaje(nombre_personaje=body["nombre_personaje"], edad=body["edad"], genero=body["genero"])
+        db.session.add(personaje_nuevo)
+        db.session.commit()
+
+        response_body = {       
+            "msg": "personaje creado",
+                                         
+            }
+        return jsonify(response_body), 201
+
+    return jsonify({"msg": "Personaje already exists"}), 400
+    
+@app.route('/planetas', methods=['POST'])
+def planetas_post():
+    body = request.json
+#busqueda del nombre del planeta en la base de datos para evitar duplicados
+    nombre_planetas=db.session.execute(select(Planetas).where(Planetas.nombre_planetas == body["nombre_planetas"])).scalar_one_or_none()
+    if  nombre_planetas  is None:
+        # si el planeta no existe, se crea un nuevo objeto Planetas con los datos proporcionados en el cuerpo de la solicitud y se guarda en la base de datos
+        planeta_nuevo = Planetas(nombre_planetas=body["nombre_planetas"], habitantes=body["habitantes"], ubicacion=body["ubicacion"])
+        db.session.add(planeta_nuevo)
+        db.session.commit()
+
+        response_body = {       
+            "msg": "planeta creado",
+                                         
+            }
+        return jsonify(response_body), 201
+# si el planeta ya existe, se devuelve un mensaje de error indicando que el planeta ya existe
+    return jsonify({"msg": "Planeta already exists"}), 400
+    
+@app.route('/vehiculos', methods=['POST'])
+def vehiculos_post():
+    body = request.json
+#busqueda del nombre del vehiculo en la base de datos para evitar duplicados
+    nombre_vehiculos=db.session.execute(select(Vehiculos).where(Vehiculos.nombre_vehiculos == body["nombre_vehiculos"])).scalar_one_or_none()
+    if  nombre_vehiculos  is None:
+ # si el vehiculo no existe, se crea un nuevo objeto Vehiculos con los datos proporcionados en el cuerpo de la solicitud y se guarda en la base de datos
+        vehiculo_nuevo = Vehiculos(nombre_vehiculos=body["nombre_vehiculos"] , modelo=body["modelo"], pasajeros=body["pasajeros"])
+        db.session.add(vehiculo_nuevo)
+        db.session.commit()
+
+        response_body = {       
+            "msg": "vehiculo creado",
+                                         
+            }
+        return jsonify(response_body), 201
+
+    return jsonify({"msg": "Vehiculo already exists"}), 400
 
 # this only runs if `$ python src/app.py` is executed
 if __name__ == '__main__':
