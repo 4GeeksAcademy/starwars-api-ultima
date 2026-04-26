@@ -158,17 +158,21 @@ def handle_vehiculo_id(vehiculo_id):
     return jsonify(response_body), 200
 
 
-@app.route('/users/favoritos', methods=['GET'])
-def handle_user_favorites():
-    user = db.session.get(User, 1)  # Aquí se asume que el ID del usuario es 1, puedes cambiarlo según tus necesidades  
+@app.route('/users/<int:user_id>/favoritos', methods=['GET'])
+def handle_user_favoritos(user_id):
+    # busqueda del usuario en la base de datos para verificar que existe
+    user = db.session.get(User, user_id)
+
     if user is None:
         return jsonify({"msg": "User not found"}), 404
-
+# si el usuario existe, se obtiene la lista de favoritos del usuario y se serializa cada favorito para incluir los detalles del personaje, vehiculo o planeta asociado
+    favoritos = list(map(lambda favorito: favorito.serialize(), user.favoritos))
 
     response_body = {
-       "msg": "ok",
-       "result": user.serialize()
-       }
+        "msg": "ok",
+        "result": favoritos
+    }
+
     return jsonify(response_body), 200
 
 #METODOS PARA CREAR USUARIOS, PERSONAJES, PLANETAS Y VEHICULOS
@@ -249,8 +253,66 @@ def vehiculos_post():
         return jsonify(response_body), 201
 
     return jsonify({"msg": "Vehiculo already exists"}), 400
+#endpoint para agregar un planeta a favoritos
+@app.route('/favorite/planet/<int:planet_id>', methods=['POST'])
+def add_favorite_planet(planet_id):
+    # busqueda del planeta en la base de datos para verificar que existe
 
-# this only runs if `$ python src/app.py` is executed
+    existing = db.session.execute(select(Favoritos).where(Favoritos.user_id == 1,Favoritos.id_planetas == planet_id)).scalar_one_or_none()
+
+    if existing:
+        return jsonify({"msg": "already exists"}), 400
+# si el planeta no existe, se crea un nuevo objeto Favoritos con los datos proporcionados en el cuerpo de la solicitud y se guarda en la base de datos
+    new_favorite = Favoritos(user_id=1, id_planetas=planet_id)
+    db.session.add(new_favorite)
+    db.session.commit()
+
+    return jsonify({"msg": "Planeta agregado a favoritos"}), 201
+
+#endpoint para agregar un vehiculo a favoritos
+@app.route('/favorite/vehiculo/<int:vehiculo_id>', methods=['POST'])
+def add_favorite_vehiculo(vehiculo_id):
+# busqueda del vehiculo en la base de datos para verificar que existe
+    existing = db.session.execute(select(Favoritos).where(Favoritos.user_id == 1,Favoritos.id_vehiculos == vehiculo_id)).scalar_one_or_none()
+
+    if existing:
+        return jsonify({"msg": "already exists"}), 400
+# si el vehiculo no existe, se crea un nuevo objeto Favoritos con los datos proporcionados en el cuerpo de la solicitud y se guarda en la base de datos
+    new_favorite = Favoritos(user_id=1, id_vehiculos=vehiculo_id)
+    db.session.add(new_favorite)
+    db.session.commit()
+
+    return jsonify({"msg": "Vehiculo agregado a favoritos"}), 201
+
+
+#endpoint para agregar un personaje a favoritos
+@app.route('/favorite/personaje/<int:personaje_id>', methods=['POST'])
+def add_favorite_personaje(personaje_id):
+
+    existing = db.session.execute(select(Favoritos).where(Favoritos.user_id == 1,Favoritos.id_personajes == personaje_id)).scalar_one_or_none()
+
+    if existing:
+        return jsonify({"msg": "already exists"}), 400
+
+    new_favorite = Favoritos(user_id=1, id_personajes=personaje_id)
+    db.session.add(new_favorite)
+    db.session.commit()
+
+    return jsonify({"msg": "Personaje agregado a favoritos"}), 201
+# endpoint para eliminar un favorito de personaje, planeta o vehiculo
+@app.route('/favorite/<int:favorito_id>', methods=['DELETE'])
+def delete_favorite(favorito_id):
+    favorito = db.session.get(Favoritos, favorito_id)
+
+    if favorito is None:
+        return jsonify({"msg": "Favorito not found"}), 404
+
+    db.session.delete(favorito)
+    db.session.commit()
+
+    return jsonify({"msg": "Favorito eliminado"}), 200
+
+
 if __name__ == '__main__':
     PORT = int(os.environ.get('PORT', 3000))
     app.run(host='0.0.0.0', port=PORT, debug=False)

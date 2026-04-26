@@ -91,8 +91,14 @@ class Favoritos(db.Model):
     def serialize(self):
         return {
             "id": self.id,
+            "user_id": self.user_id,
             "id_personajes": self.id_personajes,
             "id_vehiculos": self.id_vehiculos,
             "id_planetas": self.id_planetas,
-            "user_id": self.user_id
+            "personaje": self.personaje.serialize() if self.personaje else None,
+            "vehiculo": self.vehiculo.serialize() if self.vehiculo else None,
+            "planeta": self.planeta.serialize() if self.planeta else None
         }
+
+    def __repr__(self):
+        return f'<Favorito {self.id}>'
