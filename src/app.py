@@ -157,7 +157,7 @@ def handle_vehiculo_id(vehiculo_id):
 
     return jsonify(response_body), 200
 
-
+#endpoint para obtener la lista de favoritos de un usuario específico, incluyendo los detalles de cada favorito 
 @app.route('/users/<int:user_id>/favoritos', methods=['GET'])
 def handle_user_favoritos(user_id):
     # busqueda del usuario en la base de datos para verificar que existe
@@ -171,6 +171,7 @@ def handle_user_favoritos(user_id):
     response_body = {
         "msg": "ok",
         "result": favoritos
+
     }
 
     return jsonify(response_body), 200
@@ -314,5 +315,5 @@ def delete_favorite(favorito_id):
 
 
 if __name__ == '__main__':
-    PORT = int(os.environ.get('PORT', 3000))
-    app.run(host='0.0.0.0', port=PORT, debug=False)
+        PORT = int(os.environ.get('PORT', 3000))
+        app.run(host='0.0.0.0', port=PORT, debug=False)
