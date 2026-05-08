@@ -7,8 +7,8 @@ db = SQLAlchemy()
 
 class User(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
-    nombre: Mapped[str] = mapped_column(String(120), nullable=False)
-    apellido: Mapped[str] = mapped_column(String(120), nullable=False)
+    nombre: Mapped[str] = mapped_column(String(120), nullable=True)
+    apellido: Mapped[str] = mapped_column(String(120), nullable=True)
     email: Mapped[str] = mapped_column(String(120), unique=True, nullable=False)
     password: Mapped[str] = mapped_column(nullable=False)
    
@@ -16,6 +16,7 @@ class User(db.Model):
     favoritos: Mapped[List["Favoritos"]] = relationship("Favoritos", back_populates="user")
 
     def serialize(self):
+
         return {
             "id": self.id,
             "nombre": self.nombre,
