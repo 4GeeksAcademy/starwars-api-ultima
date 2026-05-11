@@ -29,7 +29,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 # INIT
 Migrate(app, db)
 db.init_app(app)
-CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True)
+CORS(app, resources={r"/*": {"origins": "*"}})
 setup_admin(app)
 
 # JWT
@@ -231,6 +231,9 @@ def login():
 def private():
     current_user = get_jwt_identity()
     return jsonify(msg="Acceso autorizado", user=current_user), 200
+
+
+
 # RUN SERVER
 if __name__ == '__main__':
     PORT = int(os.environ.get('PORT', 3000))
